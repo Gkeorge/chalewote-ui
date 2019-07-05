@@ -9,6 +9,7 @@ import { ActivatedRoute } from "@angular/router";
 })
 export class EventListComponent implements OnInit {
   events: Array<any>;
+  error: any;
 
   constructor(
     private eventService: EventService,
