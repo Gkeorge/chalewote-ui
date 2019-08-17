@@ -1,4 +1,31 @@
 <p *ngIf="error">{{ error }}</p>
 <p *ngFor="let user of users">
-  <span class="badge">{{ user.emailAddress }}</span>
+  <span>{{ user.emailAddress }}</span>
 </p>
+
+<!-- <label>
+  Name:
+  <input type="text" [formControl]="name">
+</label> -->
+
+<form [formGroup]="userForm" (ngSubmit)="registerNewUser()">
+  <label>
+    Email:
+    <input type="text" formControlName="emailAddress" required />
+  </label>
+
+  <label>
+    Password:
+    <input type="text" formControlName="password" />
+  </label>
+
+  <button type="submit" [disabled]="!userForm.valid">Submit</button>
+</form>
+
+<div
+  *ngIf="emailAddress.invalid && (emailAddress.dirty || emailAddress.touched)"
+>
+  <div *ngIf="emailAddress.errors.required">
+    Email Address is required.
+  </div>
+</div>

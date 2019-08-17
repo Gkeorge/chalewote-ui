@@ -17,8 +17,8 @@ const httpOptions = {
   providedIn: "root"
 })
 export class UserService {
-  private API = "//" + window.location.hostname + ":8080";
-  private USERS_API = this.API + "/api/users";
+  private API = "//" + window.location.hostname + ":8081";
+  readonly USERS_API = this.API + "/api/users";
 
   constructor(private http: HttpClient) {}
 
@@ -34,7 +34,7 @@ export class UserService {
   /** GET Registered users from server */
   getRegisteredUsers(): Observable<any> {
     return this.http.get<any>(this.USERS_API).pipe(
-      retry(3), // retry a failed request up to 3 times
+      //retry(3), // retry a failed request up to 3 times
       tap(data => this.log(data), error => this.log(error)),
       catchError(this.handleError)
     );
@@ -62,7 +62,7 @@ export class UserService {
 
   /** PUT: update registered user */
   updateRegisteredUser(user: User): Observable<any> {
-    return this.http.post<any>(this.USERS_API, user, httpOptions).pipe(
+    return this.http.put<any>(this.USERS_API, user, httpOptions).pipe(
       tap(_ => this.log(`updated user`)),
       catchError(this.handleError)
     );
@@ -78,13 +78,18 @@ export class UserService {
     );
   }
 
+  checkEmailUnique(email: string): Observable<Boolean> {
+    const url = `${this.USERS_API}/` + `email/${email}`;
+    return this.http.get<any>(url, httpOptions);
+  }
+
   /**
    * Handle Http operation that failed.
    * Let the app continue.
    * @param operation - name of the operation that failed
    * @param result - optional value to return as the observable result
    */
-  private handleError<T>(error: HttpErrorResponse) {
+  handleError<T>(error: HttpErrorResponse) {
     if (error.error instanceof ErrorEvent) {
       // A client-side or network error occurred. Handle it accordingly.
       console.error("An error occurred:", error.error.message);

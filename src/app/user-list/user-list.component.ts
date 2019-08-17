@@ -1,4 +1,6 @@
 import { Component, OnInit } from "@angular/core";
+import { FormGroup, FormControl, Validators } from "@angular/forms";
+
 import { UserService } from "../service/user/user.service";
 import { User } from "../shared/User";
 import { ActivatedRoute } from "@angular/router";
@@ -12,6 +14,21 @@ export class UserListComponent implements OnInit {
   users: Array<any>;
   error: any;
   headers: any;
+
+  // emailAddress = new FormControl("");
+
+  userForm = new FormGroup({
+    emailAddress: new FormControl("", [
+      Validators.required,
+      Validators.minLength(4)
+      //forbiddenNameValidator(/bob/i) // <-- Here's how you pass in the custom validator.
+    ]),
+    password: new FormControl("", Validators.required)
+  });
+
+  get emailAddress() {
+    return this.userForm.get("emailAddress");
+  }
 
   constructor(
     private userService: UserService,
@@ -30,8 +47,8 @@ export class UserListComponent implements OnInit {
         const keys = response.headers.keys();
         this.headers = keys.map(key => `${key}: ${response.headers.get(key)}`);
 
-        // access the body directly, which is typed as `Config`.
-        response => (this.users = response.body.content);
+        // access the body directly.
+        this.users = response.body.content;
       }, //success path
       error => (this.error = error) // error path
     );
@@ -44,8 +61,9 @@ export class UserListComponent implements OnInit {
     );
   }
 
-  registerNewUser(user: User): void {
-    this.userService.registerUser(user).subscribe();
+  registerNewUser(): void {
+    console.log("User", this.userForm.value);
+    this.userService.registerUser(this.userForm.value).subscribe();
   }
 
   deleteRegisteredUser(): void {
